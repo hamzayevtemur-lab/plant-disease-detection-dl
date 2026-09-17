@@ -19,9 +19,11 @@ data/splits/*
 
 # Model checkpoints
 models/*
-*.pt
 *.pth
 *.ckpt
+!experiments/**/best_model.pt
+!experiments/**/results.json
+!experiments/results.csv
 
 # Experiment outputs
 results/figures/*
