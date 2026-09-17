@@ -30,6 +30,10 @@ RUN useradd -m -u 1000 user
 # Copy all project files
 COPY --chown=user:user . /app
 
+# Ensure directories and full ownership
+RUN mkdir -p /app/results/figures /app/experiments && \
+    chown -R user:user /app
+
 USER user
 ENV HOME=/home/user \
     PATH=/home/user/.local/bin:$PATH \

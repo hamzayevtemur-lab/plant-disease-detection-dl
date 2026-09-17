@@ -32,8 +32,15 @@ FRONTEND_DIR = Path(__file__).parent / "frontend"
 FIGURES_DIR = PROJECT_ROOT / "results" / "figures"
 EXPERIMENTS_DIR = PROJECT_ROOT / "experiments"
 
-os.makedirs(FRONTEND_DIR, exist_ok=True)
-os.makedirs(FIGURES_DIR, exist_ok=True)
+try:
+    os.makedirs(FRONTEND_DIR, exist_ok=True)
+except Exception:
+    pass
+
+try:
+    os.makedirs(FIGURES_DIR, exist_ok=True)
+except Exception:
+    pass
 
 app = FastAPI(
     title="🌿 Plant Disease AI Classifier",
