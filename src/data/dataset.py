@@ -2,11 +2,9 @@ import os
 from pathlib import Path
 from typing import Tuple, Optional
 
-import pandas as pd
 import torch
 from torch.utils.data import Dataset, DataLoader
 from torchvision import transforms
-from datasets import load_from_disk
 
 
 IMAGE_SIZE = 224
@@ -37,6 +35,8 @@ def get_eval_transforms() -> transforms.Compose:
 class PlantVillageDataset(Dataset):
     """PyTorch Dataset for PlantVillage crop disease images."""
     def __init__(self, csv_file: str, dataset_dir: str = "data/raw/plantvillage", transform: Optional[transforms.Compose] = None):
+        import pandas as pd
+        from datasets import load_from_disk
         self.data = pd.read_csv(csv_file)
         self.dataset = load_from_disk(dataset_dir)
         self.transform = transform
