@@ -4,7 +4,8 @@ FROM python:3.11-slim
 # Set environment variables
 ENV PYTHONUNBUFFERED=1 \
     PYTHONDONTWRITEBYTECODE=1 \
-    PORT=7860
+    PYTHONPATH=/app \
+    PORT=10000
 
 # Set working directory
 WORKDIR /app
@@ -23,17 +24,19 @@ RUN pip install --no-cache-dir --upgrade pip && \
     pip install --no-cache-dir torch torchvision --index-url https://download.pytorch.org/whl/cpu && \
     pip install --no-cache-dir -r requirements-prod.txt
 
-# Create non-root user for security and Hugging Face Spaces compatibility
+# Create non-root user
 RUN useradd -m -u 1000 user
-USER user
-ENV HOME=/home/user \
-    PATH=/home/user/.local/bin:$PATH
 
-# Copy project files
+# Copy all project files
 COPY --chown=user:user . /app
 
-# Expose port (7860 default for HF Spaces, configurable via $PORT)
-EXPOSE 7860
+USER user
+ENV HOME=/home/user \
+    PATH=/home/user/.local/bin:$PATH \
+    PYTHONPATH=/app
 
-# Run the FastAPI server
-CMD ["sh", "-c", "python -m uvicorn app.main:app --host 0.0.0.0 --port ${PORT:-7860}"]
+# Expose default port
+EXPOSE 10000
+
+# Run entry point
+CMD ["python", "app.py"]
