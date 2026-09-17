@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FloraGuard AI — Plant Disease Diagnosis & Detection</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+  <!-- Header -->
+  <header class="app-header">
+    <div class="header-container">
+      <div class="logo-group">
+        <div class="logo-icon">🌿</div>
+        <div>
+          <h1 class="logo-title">FloraGuard <span class="ai-badge">AI</span></h1>
+          <p class="logo-subtitle">Deep Learning Plant Disease & Crop Health Diagnosis</p>
+        </div>
+      </div>
+
+      <div class="header-actions">
+        <!-- Model Switcher -->
+        <div class="model-switcher-card">
+          <span class="switcher-label">Active Model:</span>
+          <select id="modelSelect" class="model-select">
+            <option value="">Loading models...</option>
+          </select>
+        </div>
+
+        <!-- Nav Tabs -->
+        <nav class="nav-tabs">
+          <button id="tabDiagnose" class="tab-btn active" onclick="switchTab('diagnose')">🔬 Diagnosis</button>
+          <button id="tabBenchmark" class="tab-btn" onclick="switchTab('benchmark')">📊 Benchmark</button>
+        </nav>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Container -->
+  <main class="main-content">
+    <!-- TAB 1: DIAGNOSIS -->
+    <section id="sectionDiagnose" class="tab-pane active">
+      <div class="grid-layout">
+        <!-- Left: Upload & Input Card -->
+        <div class="card upload-card">
+          <h2 class="card-title">🌱 Upload Crop Leaf</h2>
+          <p class="card-desc">Upload a leaf photo from your computer or paste an online image URL to diagnose diseases across 38 crop categories.</p>
+
+          <!-- Dropzone -->
+          <div id="dropzone" class="dropzone">
+            <input type="file" id="fileInput" accept="image/*" class="file-input">
+            <div id="dropzoneContent" class="dropzone-inner">
+              <div class="upload-icon-circle">
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                  <polyline points="17 8 12 3 7 8"></polyline>
+                  <line x1="12" y1="3" x2="12" y2="15"></line>
+                </svg>
+              </div>
+              <p class="drop-text"><strong>Click to upload</strong> or drag and drop</p>
+              <span class="drop-subtext">Supports PNG, JPG, JPEG, WebP</span>
+            </div>
+            <!-- Image Preview -->
+            <div id="previewContainer" class="preview-container hidden">
+              <img id="imagePreview" alt="Leaf Preview" class="image-preview">
+              <button id="removeImageBtn" class="remove-btn" title="Remove image">✕</button>
+            </div>
+          </div>
+
+          <!-- URL Input Section -->
+          <div class="url-input-section">
+            <label for="imageUrlInput" class="url-label">🔗 Or Paste Image URL Address:</label>
+            <div class="url-input-group">
+              <input type="url" id="imageUrlInput" placeholder="https://example.com/leaf-photo.jpg" class="url-input">
+              <button id="loadUrlBtn" class="url-load-btn" onclick="handleUrlInput()">Load URL</button>
+            </div>
+          </div>
+
+          <!-- Action Button -->
+          <button id="diagnoseBtn" class="btn-primary" disabled onclick="runDiagnosis()">
+            <span id="btnText">Analyze & Diagnose Leaf</span>
+            <div id="btnSpinner" class="spinner hidden"></div>
+          </button>
+        </div>
+
+        <!-- Right: Diagnosis & Treatment Results -->
+        <div class="card result-card">
+          <!-- Placeholder state -->
+          <div id="emptyResultState" class="empty-state">
+            <div class="empty-icon">🍃</div>
+            <h3>No Leaf Analyzed Yet</h3>
+            <p>Upload a leaf image or paste an image link on the left to view comprehensive disease diagnosis, confidence metrics, and treatment guidance.</p>
+          </div>
+
+          <!-- Non-Leaf OOD Alert Banner -->
+          <div id="oodWarningBanner" class="warning-banner hidden">
+            <div class="warning-icon">⚠️</div>
+            <div>
+              <strong>Non-Plant Image Detected:</strong>
+              <p id="oodWarningText">The uploaded image does not appear to be a crop leaf. Neural network predictions on non-botanical images are out-of-distribution and unreliable.</p>
+            </div>
+          </div>
+
+          <!-- Diagnosis Result View -->
+          <div id="resultContent" class="result-content hidden">
+            <!-- Header Summary -->
+            <div class="diagnosis-header">
+              <div>
+                <div class="crop-tag" id="cropName">Tomato</div>
+                <h3 class="disease-name" id="diseaseName">Late Blight</h3>
+              </div>
+              <div id="healthBadge" class="health-badge diseased">
+                <span id="healthIcon">⚠️</span>
+                <span id="healthStatus">Disease Detected</span>
+              </div>
+            </div>
+
+            <!-- Stats Bar -->
+            <div class="stats-grid">
+              <div class="stat-box">
+                <span class="stat-label">Model Confidence</span>
+                <span class="stat-value" id="confidenceValue">98.5%</span>
+              </div>
+              <div class="stat-box">
+                <span class="stat-label">Inference Latency</span>
+                <span class="stat-value" id="latencyValue">2.4 ms</span>
+              </div>
+              <div class="stat-box">
+                <span class="stat-label">Model Engine</span>
+                <span class="stat-value small" id="activeModelLabel">mobilenet_v3</span>
+              </div>
+            </div>
+
+            <!-- Symptoms Section -->
+            <div class="info-block">
+              <h4 class="info-heading">🔍 Observed Symptoms</h4>
+              <p class="info-text" id="symptomsText">Loading symptoms...</p>
+            </div>
+
+            <!-- Treatment Guidance -->
+            <div class="treatment-grid">
+              <div class="treatment-card organic">
+                <div class="treatment-title">🌱 Organic & Cultural Remedy</div>
+                <p id="organicText" class="treatment-text">Loading...</p>
+              </div>
+              <div class="treatment-card chemical">
+                <div class="treatment-title">🧪 Chemical & Preventative Control</div>
+                <p id="chemicalText" class="treatment-text">Loading...</p>
+              </div>
+            </div>
+
+            <!-- Top 5 Probability Breakdown -->
+            <div class="top5-section">
+              <h4 class="info-heading">📊 Top 5 Predictions Breakdown</h4>
+              <div id="top5List" class="top5-list">
+                <!-- Dynamically populated -->
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB 2: BENCHMARK LEADERBOARD -->
+    <section id="sectionBenchmark" class="tab-pane hidden">
+      <div class="card full-width">
+        <div class="benchmark-header">
+          <div>
+            <h2 class="card-title">🏆 Model Architecture Leaderboard</h2>
+            <p class="card-desc">Comprehensive production benchmarks across Custom CNNs, MobileNetV3, and ResNet-18.</p>
+          </div>
+          <button class="btn-secondary" onclick="loadBenchmark()">🔄 Refresh Leaderboard</button>
+        </div>
+
+        <!-- Leaderboard Table -->
+        <div class="table-responsive">
+          <table class="benchmark-table">
+            <thead>
+              <tr>
+                <th>Model Architecture</th>
+                <th>Parameters</th>
+                <th>Size (MB)</th>
+                <th>Inference Latency</th>
+                <th>Validation Acc</th>
+                <th>Test Accuracy</th>
+                <th>Test Loss</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody id="benchmarkTableBody">
+              <tr>
+                <td colspan="8" class="text-center">Loading benchmark data...</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Static Chart if available -->
+        <div class="chart-container">
+          <h3 class="chart-title">📈 Benchmark Accuracy Comparison</h3>
+          <img src="/figures/model_accuracy_comparison.png" alt="Accuracy Comparison Chart" class="chart-image" onerror="this.style.display='none'">
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Footer -->
+  <footer class="app-footer">
+    <p>FloraGuard AI • Powered by PyTorch & FastAPI • PlantVillage 38-Class Dataset</p>
+  </footer>
+
+  <script src="/static/script.js"></script>
+</body>
+</html>

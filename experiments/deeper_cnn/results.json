@@ -1,0 +1,33 @@
+{
+    "experiment": "deeper_cnn",
+    "model_config": {
+        "name": "deeper_cnn",
+        "num_classes": 38,
+        "in_channels": 3,
+        "channels": [
+            32,
+            64,
+            128,
+            256,
+            512
+        ],
+        "kernel_size": 3,
+        "pool_size": 2,
+        "dropout": 0.5
+    },
+    "training_config": {
+        "batch_size": 32,
+        "learning_rate": 0.001,
+        "weight_decay": 0.0,
+        "epochs": 10
+    },
+    "best_epoch": 9,
+    "validation_loss": 0.0916931208603833,
+    "validation_accuracy": 0.9720526068576797,
+    "test_loss": 0.07474529263840562,
+    "test_accuracy": 0.9770734380708805,
+    "parameters": 1590054,
+    "size_mb": 18.23,
+    "latency_ms": 2.6,
+    "fps": 384.8
+}

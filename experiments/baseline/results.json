@@ -1,0 +1,32 @@
+{
+    "experiment": "baseline",
+    "model_config": {
+        "name": "baseline",
+        "num_classes": 38,
+        "in_channels": 3,
+        "channels": [
+            32,
+            64,
+            128,
+            256
+        ],
+        "kernel_size": 3,
+        "pool_size": 2,
+        "dropout": 0.5
+    },
+    "training_config": {
+        "batch_size": 32,
+        "learning_rate": 0.001,
+        "weight_decay": 0.0,
+        "epochs": 10
+    },
+    "best_epoch": 10,
+    "validation_loss": 0.13200966689207216,
+    "validation_accuracy": 0.9591357444809769,
+    "test_loss": 0.12058027955515714,
+    "test_accuracy": 0.9600840336134454,
+    "parameters": 399142,
+    "size_mb": 4.6,
+    "latency_ms": 2.23,
+    "fps": 448.7
+}

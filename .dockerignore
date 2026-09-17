@@ -1,0 +1,28 @@
+# Python / Environment
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+myvenv/
+.venv/
+
+# Git & OS
+.git
+.gitignore
+.DS_Store
+
+# Local test & scratch data
+data/raw/
+data/processed/
+data/sample/
+notebooks/
+results/figures/
+tests/
+.pytest_cache/
+.gemini/
+
+# Keep experiments checkpoints for active models!
+!experiments/
